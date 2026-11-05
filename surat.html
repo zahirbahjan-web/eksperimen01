@@ -1,0 +1,515 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Surat Untukmu ❤️</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #ffe0e9, #fff0f5, #ffd1dc);
+    font-family: Georgia, "Times New Roman", serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    padding: 30px 12px;
+    color: #713b4c;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.scene {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    font-size: 27px;
+    text-align: center;
+    color: #b34367;
+    margin: 0 0 12px;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 15px;
+    margin: 0 0 28px;
+}
+
+.stage {
+    position: relative;
+    width: min(340px, 94vw);
+    height: 235px;
+    perspective: 1000px;
+    transition: height 1s ease;
+}
+
+/* Amplop bagian belakang */
+.envelope-back {
+    position: absolute;
+    inset: 45px 0 0;
+    background: #e9a1b5;
+    border-radius: 5px 5px 12px 12px;
+    z-index: 1;
+}
+
+/* Lembar surat yang awalnya berada di dalam amplop */
+.letter {
+    position: absolute;
+    z-index: 2;
+    width: 88%;
+    height: 175px;
+    left: 6%;
+    bottom: 8px;
+    padding: 22px 16px;
+    overflow: hidden;
+    background: #fffaf7;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0 2px 8px #a94e6b22;
+    transition:
+        bottom 1.1s ease,
+        height 1s ease,
+        width 1s ease,
+        left 1s ease,
+        padding 1s ease;
+}
+
+.letter-intro {
+    font-size: 17px;
+    line-height: 1.7;
+}
+
+.letter-intro .heart {
+    font-size: 29px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* Isi surat dan 5 foto */
+.memories {
+    display: none;
+    width: 100%;
+    text-align: center;
+    opacity: 0;
+}
+
+.memories h2 {
+    color: #b34367;
+    font-size: 26px;
+    margin: 5px 0 15px;
+}
+
+.memories .message {
+    font-size: 16px;
+    line-height: 1.8;
+    margin: 0 0 22px;
+}
+
+.photo-item {
+    width: 100%;
+    margin: 0 auto 27px;
+}
+
+.photo-item img {
+    display: block;
+    width: 100%;
+    max-height: 430px;
+    object-fit: contain;
+    border-radius: 3px;
+}
+
+.photo-caption {
+    margin: 10px 4px 0;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #874b5d;
+    overflow-wrap: anywhere;
+}
+
+.end-message {
+    font-size: 17px;
+    line-height: 1.8;
+    margin: 28px 0 8px;
+    color: #a33f62;
+}
+
+/* Bagian depan amplop */
+.envelope-front {
+    position: absolute;
+    inset: 45px 0 0;
+    z-index: 5;
+    overflow: hidden;
+    border-radius: 0 0 12px 12px;
+    pointer-events: none;
+}
+
+.envelope-front::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #f4b8c8;
+    clip-path: polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%);
+}
+
+.envelope-front::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #e99ab1;
+    clip-path: polygon(0 100%, 0 0, 50% 60%, 100% 0, 100% 100%);
+    opacity: 0.3;
+}
+
+/* Tutup amplop */
+.flap {
+    position: absolute;
+    top: 45px;
+    left: 0;
+    width: 100%;
+    height: 125px;
+    z-index: 6;
+    background: #f8c5d2;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top center;
+    transform: rotateX(0deg);
+    transition: transform 0.75s ease;
+    backface-visibility: hidden;
+}
+
+/* Tombol */
+.controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.btn {
+    border: none;
+    border-radius: 30px;
+    padding: 12px 22px;
+    font-size: 15px;
+    background: #c94f76;
+    color: white;
+    box-shadow: 0 4px 12px #9f345333;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    background: #ad3e63;
+}
+
+.btn.secondary {
+    background: #fff8fa;
+    color: #b34367;
+    border: 1px solid #e9a1b5;
+}
+
+.hint {
+    text-align: center;
+    color: #99536a;
+    font-size: 13px;
+    margin-top: 16px;
+}
+
+/* Saat amplop dibuka */
+.stage.opening .flap,
+.stage.open .flap {
+    transform: rotateX(180deg);
+    z-index: 0;
+}
+
+.stage.opening .letter {
+    bottom: 35px;
+    height: 190px;
+}
+
+.stage.open .letter {
+    z-index: 4;
+    position: relative;
+    left: auto;
+    bottom: auto;
+    width: 100%;
+    height: auto;
+    min-height: 300px;
+    padding: 24px 17px;
+    margin-top: 0;
+    overflow: visible;
+    text-align: center;
+    background: #fffaf7;
+    box-shadow: none;
+    border-radius: 4px;
+}
+
+.stage.open {
+    height: auto;
+    min-height: 235px;
+    margin-top: 0;
+}
+
+.stage.open .envelope-back,
+.stage.open .envelope-front,
+.stage.open .flap {
+    display: none;
+}
+
+.stage.open .letter-intro {
+    display: none;
+}
+
+.stage.open .memories {
+    display: block;
+    animation: showMemories 0.8s ease 0.1s forwards;
+}
+
+@keyframes showMemories {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Hati dekorasi */
+.floating-heart {
+    position: fixed;
+    bottom: -30px;
+    font-size: 20px;
+    opacity: 0.7;
+    pointer-events: none;
+    animation: floatUp 7s linear infinite;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+    }
+    15% {
+        opacity: 0.7;
+    }
+    100% {
+        transform: translateY(-110vh) rotate(35deg);
+        opacity: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 23px;
+    }
+
+    .stage.open .letter {
+        padding: 20px 13px;
+    }
+
+    .memories h2 {
+        font-size: 23px;
+    }
+
+    .photo-item img {
+        max-height: 380px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="scene">
+    <h1>Untuk Seseorang yang Spesial ❤️</h1>
+    <p class="subtitle">Ada sesuatu yang ingin aku sampaikan kepadamu...</p>
+
+    <div class="stage" id="stage">
+
+        <div class="envelope-back"></div>
+
+        <div class="letter" id="letter">
+
+            <div class="letter-intro">
+                <span class="heart">💌</span>
+                <strong>Sebuah surat untukmu</strong>
+                <p>Buka surat ini untuk melihat kenangan kita.</p>
+            </div>
+
+            <div class="memories">
+
+                <h2>Dear You ❤️</h2>
+
+                <p class="message">
+                    Ada banyak hal yang ingin aku ceritakan,
+                    dan ada beberapa kenangan yang ingin aku simpan
+                    bersamamu. Ini adalah sebagian kecil dari semuanya.
+                </p>
+
+                <div class="photo-item">
+                    <img src="foto1.jpg" alt="Kenangan pertama">
+                    <p class="photo-caption">
+                        Kenangan pertama yang selalu membuatku tersenyum.
+                    </p>
+                </div>
+
+                <div class="photo-item">
+                    <img src="foto2.jpg" alt="Kenangan kedua">
+                    <p class="photo-caption">
+                        Momen sederhana yang terasa istimewa karena ada kamu.
+                    </p>
+                </div>
+
+                <div class="photo-item">
+                    <img src="foto3.jpg" alt="Kenangan ketiga">
+                    <p class="photo-caption">
+                        Salah satu kenangan yang ingin aku ingat lebih lama.
+                    </p>
+                </div>
+
+                <div class="photo-item">
+                    <img src="foto4.jpg" alt="Kenangan keempat">
+                    <p class="photo-caption">
+                        Semoga kita punya lebih banyak cerita indah setelah ini.
+                    </p>
+                </div>
+
+                <div class="photo-item">
+                    <img src="foto5.jpg" alt="Kenangan kelima">
+                    <p class="photo-caption">
+                        Terima kasih sudah menjadi bagian dari cerita ini. ❤️
+                    </p>
+                </div>
+
+                <p class="end-message">
+                    Semoga kenangan ini selalu punya tempat yang indah
+                    untuk kita ingat. 💗
+                </p>
+
+            </div>
+        </div>
+
+        <div class="envelope-front"></div>
+        <div class="flap"></div>
+
+    </div>
+
+    <div class="controls">
+        <button class="btn" id="openBtn" onclick="openLetter()">
+            Buka Surat 💌
+        </button>
+
+        <button class="btn secondary" id="closeBtn"
+                onclick="closeLetter()" hidden>
+            Tutup Surat
+        </button>
+    </div>
+
+    <p class="hint" id="hint">
+        Tekan tombol “Buka Surat” untuk memulai.
+    </p>
+</div>
+
+<script>
+const stage = document.getElementById("stage");
+const openBtn = document.getElementById("openBtn");
+const closeBtn = document.getElementById("closeBtn");
+const hint = document.getElementById("hint");
+
+let isOpen = false;
+let isAnimating = false;
+
+function openLetter() {
+    if (isOpen || isAnimating) return;
+
+    isAnimating = true;
+    stage.classList.add("opening");
+    openBtn.disabled = true;
+    hint.textContent = "Suratnya sedang dibuka... 💗";
+
+    // Beri waktu agar tutup amplop terbuka dan surat terangkat.
+    setTimeout(() => {
+        stage.classList.remove("opening");
+        stage.classList.add("open");
+
+        isOpen = true;
+        isAnimating = false;
+        openBtn.hidden = true;
+        closeBtn.hidden = false;
+        openBtn.disabled = false;
+
+        hint.textContent = "Simpan kenangan ini baik-baik ❤️";
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }, 1100);
+}
+
+function closeLetter() {
+    if (!isOpen || isAnimating) return;
+
+    isAnimating = true;
+    stage.classList.remove("open");
+    stage.classList.add("opening");
+
+    closeBtn.disabled = true;
+    hint.textContent = "Suratnya kembali ke dalam amplop...";
+
+    setTimeout(() => {
+        stage.classList.remove("opening");
+
+        isOpen = false;
+        isAnimating = false;
+        openBtn.hidden = false;
+        closeBtn.hidden = true;
+        closeBtn.disabled = false;
+
+        hint.textContent = "Tekan tombol “Buka Surat” untuk membukanya lagi.";
+    }, 1100);
+}
+
+// Hiasan hati yang bergerak di latar belakang.
+const heartSymbols = ["❤️", "💕", "💗", "💖"];
+
+function createHeart() {
+    const heart = document.createElement("div");
+    heart.className = "floating-heart";
+    heart.textContent =
+        heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.animationDuration = (5 + Math.random() * 5) + "s";
+    heart.style.fontSize = (13 + Math.random() * 17) + "px";
+
+    document.body.appendChild(heart);
+
+    setTimeout(() => {
+        heart.remove();
+    }, 10000);
+}
+
+setInterval(createHeart, 900);
+</script>
+
+</body>
+</html>
